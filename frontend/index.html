@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DAG-MILE — Intelligent Dataset Preparation</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <span class="logo">⛁</span>
+        <div>
+          <h1>DAG-MILE</h1>
+          <p>Intelligent Dataset Preparation</p>
+        </div>
+      </div>
+      <nav class="steps" id="stepNav">
+        <div class="step active" data-step="upload">1. Upload</div>
+        <div class="step" data-step="analysis">2. Analysis</div>
+        <div class="step" data-step="schema">3. Schema Matching</div>
+        <div class="step" data-step="preprocess">4. Preprocessing</div>
+        <div class="step" data-step="final">5. Final Dataset</div>
+      </nav>
+    </header>
+
+    <main>
+      <!-- STEP 1: UPLOAD -->
+      <section class="panel" id="panel-upload">
+        <h2>📁 Upload your datasets</h2>
+        <div class="dropzone" id="dropzone">
+          <p><strong>Drop files or select a folder</strong></p>
+          <p class="muted">CSV • XLSX • XLS • XLSB • XLSM • JSON • TSV • ODS</p>
+          <input
+            type="file"
+            id="fileInput"
+            multiple
+            webkitdirectory
+            directory
+            accept=".csv,.xlsx,.xls,.xlsm,.xlsb,.json,.tsv,.ods"
+            hidden
+            > 
+        </div>  
+        <ul class="file-pill-list" id="pendingFiles"></ul>
+        <div class="actions">
+          <button class="btn primary" id="analyzeBtn" disabled>Analyze →</button>
+        </div>
+      </section>
+
+      <!-- STEP 2: DATASET ANALYSIS -->
+      <section class="panel hidden" id="panel-analysis">
+        <h2>Dataset Analysis</h2>
+        <p class="muted">Files detected: <span id="fileCount">0</span></p>
+        <div class="table-wrap">
+          <table id="fileTable">
+            <thead><tr><th>File</th><th>Rows × Cols</th><th>Missing cells</th><th>Duplicate rows</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="actions">
+          <button class="btn ghost" data-back="upload">← Back</button>
+          <button class="btn primary" id="toSchemaBtn">Continue →</button>
+        </div>
+      </section>
+
+      <!-- STEP 3: SCHEMA MATCHING -->
+      <section class="panel hidden" id="panel-schema">
+        <h2>Schema Matching</h2>
+        <div id="conflictList"></div>
+        <div id="noConflicts" class="hidden empty-state">✓ No naming conflicts detected across files.</div>
+
+        <h3>Combine datasets (optional)</h3>
+        <div class="merge-box">
+          <div class="merge-row">
+            <select id="mergeFileA"></select>
+            <select id="mergeOp">
+              <option value="join">JOIN on…</option>
+              <option value="concat">CONCAT (stack rows)</option>
+            </select>
+            <select id="mergeFileB"></select>
+          </div>
+          <div class="merge-row" id="joinKeysRow">
+            <select id="mergeColA"></select>
+            <span>=</span>
+            <select id="mergeColB"></select>
+            <select id="mergeHow">
+              <option value="inner">inner</option>
+              <option value="left">left</option>
+              <option value="outer">outer</option>
+            </select>
+          </div>
+          <div class="merge-row">
+            <input type="text" id="mergeName" placeholder="merged_dataset.csv">
+            <button class="btn secondary" id="mergeBtn">Merge</button>
+          </div>
+          <p class="muted" id="mergeStatus"></p>
+        </div>
+
+        <div class="actions">
+          <button class="btn ghost" data-back="analysis">← Back</button>
+          <button class="btn primary" id="toPreprocessBtn">Continue →</button>
+        </div>
+      </section>
+
+      <!-- STEP 4: PREPROCESSING -->
+      <section class="panel hidden" id="panel-preprocess">
+        <h2>Preprocessing</h2>
+        <div class="field-row">
+          <label>File to clean:</label>
+          <select id="preprocessFileSelect"></select>
+        </div>
+
+        <div class="quality-summary" id="qualitySummary"></div>
+
+        <div class="table-wrap">
+          <table id="suggestTable">
+            <thead>
+              <tr>
+                <th>Column</th><th>Type</th><th>Missing</th><th>Missing action</th>
+                <th>Outliers</th><th>Outlier action</th><th>Encode</th><th>Scale</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <label class="checkbox-row">
+          <input type="checkbox" id="dropDupCheckbox" checked>
+          Remove duplicate rows (<span id="dupCount">0</span> found)
+        </label>
+
+        <div class="actions">
+          <button class="btn ghost" data-back="schema">← Back</button>
+          <button class="btn primary" id="applyBtn">Apply →</button>
+        </div>
+      </section>
+
+      <!-- STEP 5: FINAL -->
+      <section class="panel hidden" id="panel-final">
+        <h2>Final Dataset</h2>
+        <div class="log-box" id="transformLog"></div>
+        <div class="actions">
+          <select id="finalFileSelect"></select>
+          <button class="btn primary" id="downloadDataBtn">⬇ Download cleaned data</button>
+          <button class="btn secondary" id="downloadLogBtn">⬇ Download transformation log</button>
+          <button class="btn ghost" data-back="preprocess">← Back to preprocess another file</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
